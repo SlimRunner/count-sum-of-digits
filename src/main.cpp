@@ -3,7 +3,7 @@
 #include <iostream>
 
 int main() {
-  constexpr int MATCH = 15;
+  constexpr int MATCH = 24;
   Transformer trans = [](std::vector<int> vars) -> int {
     int res = 0;
     for (const & var: vars) {

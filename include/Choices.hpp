@@ -13,7 +13,6 @@ private:
   int mFactor;
 
 public:
-  Choices(int factor, int start, int end, int rest...);
   Choices(int factor, int start, int end);
   Choices();
 

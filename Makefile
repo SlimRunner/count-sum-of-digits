@@ -31,8 +31,8 @@ REL_OBJ_DIR := $(RELEASE_DIR)/objects
 REL_APP_DIR := $(RELEASE_DIR)/app
 TARGET      := counter$(EXT)
 INCLUDE     := -I include/
-SRC         :=                                  \
-  $(call FixPath,$(wildcard src/*.cpp))         \
+SRC         :=           \
+  $(wildcard src/*.cpp)
 
 REL_OBJECTS      := $(SRC:%.cpp=$(REL_OBJ_DIR)/%.o)
 REL_DEPENDENCIES := $(REL_OBJECTS:.o=.d)

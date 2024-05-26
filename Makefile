@@ -23,14 +23,14 @@ CXXVERSION  := -std=c++17
 CXXSTRICT   := -pedantic-errors -Werror
 CXXWARN     := -Wall -Wextra -Wshadow -Wsign-conversion
 CXXFLAGS    := $(CXXVERSION) $(CXXWARN) $(CXXSTRICT)
-DEBUG_DIR   := $(call FixPath,./build/debug)
-RELEASE_DIR := $(call FixPath,./build/release)
-DBG_OBJ_DIR := $(call FixPath,$(DEBUG_DIR)/objects)
-DBG_APP_DIR := $(call FixPath,$(DEBUG_DIR)/app)
-REL_OBJ_DIR := $(call FixPath,$(RELEASE_DIR)/objects)
-REL_APP_DIR := $(call FixPath,$(RELEASE_DIR)/app)
+DEBUG_DIR   := ./build/debug
+RELEASE_DIR := ./build/release
+DBG_OBJ_DIR := $(DEBUG_DIR)/objects
+DBG_APP_DIR := $(DEBUG_DIR)/app
+REL_OBJ_DIR := $(RELEASE_DIR)/objects
+REL_APP_DIR := $(RELEASE_DIR)/app
 TARGET      := counter$(EXT)
-INCLUDE     := -I $(call FixPath,include/)
+INCLUDE     := -I include/
 SRC         :=                                  \
   $(call FixPath,$(wildcard src/*.cpp))         \
 
@@ -43,10 +43,13 @@ DBG_DEPENDENCIES := $(DBG_OBJECTS:.o=.d)
 # default build
 all: build
 
+# Include dependencies (allows recompilation on header changes)
+-include $(REL_DEPENDENCIES) $(DBG_DEPENDENCIES)
+
 # release objects
-$(REL_OBJ_DIR)/%.o: %.cpp
+$(REL_OBJ_DIR)/%.o: %.cpp Makefile
 	$(call MD,$(call FixPath,$(@D)))
-	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $(call FixPath,$<) -MMD -o $(call FixPath,$@)
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -MMD -o $@
 
 # release binary
 $(REL_APP_DIR)/$(TARGET): $(REL_OBJECTS)
@@ -54,17 +57,14 @@ $(REL_APP_DIR)/$(TARGET): $(REL_OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $(call FixPath,$(REL_APP_DIR)/$(TARGET)) $(call FixPath,$^)
 
 # debug objects
-$(DBG_OBJ_DIR)/%.o: %.cpp
+$(DBG_OBJ_DIR)/%.o: %.cpp Makefile
 	$(call MD,$(call FixPath,$(@D)))
-	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $(call FixPath,$<) -MMD -o $(call FixPath,$@)
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -MMD -o $@
 
 # debug binary
 $(DBG_APP_DIR)/$(TARGET): $(DBG_OBJECTS)
 	$(call MD,$(call FixPath,$(@D)))
 	$(CXX) $(CXXFLAGS) -o $(call FixPath,$@) $(call FixPath,$^)
-
-# only needed if more makefiles are added to this project
-# -include $(REL_DEPENDENCIES)
 
 # do not interpret these names as files
 .PHONY:
